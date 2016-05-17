@@ -1,0 +1,9 @@
+{
+  "name": "bluMisc",
+  "title": "bluMyst's Misc Mods",
+  "version": "0.1.0",
+  "author": "bluMyst",
+  "contact": "bluMyst on forums.factorio.com",
+  //"dependencies": ["base >= 0.12.0"],
+  "description": ""
+}
