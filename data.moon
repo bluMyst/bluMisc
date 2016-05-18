@@ -1,1 +1,3 @@
-require 'control'
+-- Bad idea:
+-- require 'control'
+-- (long story, see template repo)
