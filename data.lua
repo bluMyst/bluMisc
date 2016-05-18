@@ -1,1 +1,1 @@
-return require("control.lua")
+return require('control')
