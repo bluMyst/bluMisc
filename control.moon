@@ -1,20 +1,30 @@
 std = require 'std._base'
+require 'defines'
 
-local console_frame
+command_run = (player) ->
+    console_frame = player.gui.top.console_frame
+    command = console_frame.command.text
+    player.print ">>> #{command}"
 
-command_run = (command=console_frame.command.text) ->
-    result_string = std.tostring(loadstring(command)())
-    result_string = ">>> #{result_string}"
-    game.local_player.print(result_string)
+    -- loadstring('1+1') -> nil
+    -- loadstring('return a = 1') -> nil
+    -- loadstring('return 1+1') -> function
+    command = loadstring("return #{command}") or loadstring(command)
+    success, return_ = pcall(command)
+    if success
+        player.print std.tostring(return_)
+    else
+        player.print "ERROR: #{return_}"
+
     console_frame.command.text = ''
 
-make_gui = ->
-    game.local_player.gui.top.add
+make_gui = (player) ->
+    player.gui.top.add
         type:     'frame'
-        name:     'console-frame' -- underscores or dashes?
+        name:     'console_frame'
         caption:  'console'
 
-    console_frame = game.local_player.gui.top.console_frame
+    console_frame = player.gui.top.console_frame
 
     console_frame.add
         type:  'textfield'
@@ -30,21 +40,31 @@ make_gui = ->
         name:     'close'
         caption:  'close'
 
-    script.on_event defines.on_gui_click, (element, player_index) ->
-        if element == console_frame.submit
-            command_run()
-        elseif element == console_frame.close
-            destroy_gui()
+script.on_event defines.events.on_gui_click, (event) ->
+    player = game.players[event.player_index]
+    console_frame = player.gui.top.console_frame
 
-    script.on_event defines.on_tick, ->
-        command = console_frame.command.text
+    if event.element == console_frame.submit
+        -- can't just call it because of weird namespace problem
+        remote.call('blumisc', 'command_run', player)
+    elseif event.element == console_frame.close
+        remote.call('blumisc', 'destroy_gui', player)
 
-        if command\find '\n' != nil
-            command_run()
+destroy_gui = (player) ->
+    script.on_event defines.events.on_gui_click, nil
+    player.gui.top.console_frame.destroy()
 
-destroy_gui = ->
-    script.on_event defines.on_gui_click, nil
-    script.on_event defines.on_tick, nil
-    console_frame.destroy()
+remote.add_interface 'blumisc', {
+    make_gui:make_gui,
+    destroy_gui:destroy_gui,
+    command_run:command_run}
+--  get: -> {make_gui:make_gui, destroy_gui:destroy_gui}}
+-- can't copy object of type function
 
-make_gui()
+script.on_event defines.events.on_player_created, (event) ->
+    -- BUG: Doesn't work for sandbox mode.
+    player = game.players[event.player_index]
+
+    if player.gui.top.console_frame == nil
+        make_gui player
+-- 'game' is nil...?
