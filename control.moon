@@ -1,6 +1,20 @@
 std = require 'std._base'
 require 'defines'
 
+DEBUG = true
+
+gui_tostring = (top_element) ->
+    elements = {}
+    i = top_element
+
+    while i != nil:
+        elements[#elements++] = i.name
+        i = i.parent
+
+    s = table.concat(std.ireverse(elements), '/')
+
+    return s
+
 command_run = (player) ->
     console_frame = player.gui.top.console_frame
     command = console_frame.command.text
@@ -20,9 +34,10 @@ command_run = (player) ->
 
 make_gui = (player) ->
     player.gui.top.add
-        type:     'frame'
-        name:     'console_frame'
-        caption:  'console'
+        type:       'frame'
+        name:       'console_frame'
+        caption:    'console'
+        direction:  'vertical'
 
     console_frame = player.gui.top.console_frame
 
@@ -31,24 +46,49 @@ make_gui = (player) ->
         name:  'command'
 
     console_frame.add
+        type:       'flow'
+        name:       'button_flow'
+        direction:  'horizontal'
+
+    console_frame.button_flow.add
         type:     'button'
         name:     'submit'
         caption:  'submit'
 
-    console_frame.add
+    if debug
+        console_frame.button_flow.add
+            type:     'button'
+            name:     'reset'
+            caption:  'reset'
+    else
+        console_frame.button_flow.add
+            type:     'button'
+            name:     'clear'
+            caption:  'clear'
+
+    console_frame.button_flow.add
         type:     'button'
         name:     'close'
         caption:  'close'
 
-script.on_event defines.events.on_gui_click, (event) ->
-    player = game.players[event.player_index]
-    console_frame = player.gui.top.console_frame
+    -- TODO: Run this on_init
+    script.on_event defines.events.on_gui_click, (event) ->
+        player = game.players[event.player_index]
+        console_frame = player.gui.top.console_frame
 
-    if event.element == console_frame.submit
-        -- can't just call it because of weird namespace problem
-        remote.call('blumisc', 'command_run', player)
-    elseif event.element == console_frame.close
-        remote.call('blumisc', 'destroy_gui', player)
+        if event.element == console_frame.button_flow.submit
+            -- can't just call it because of weird namespace problem
+            remote.call('blumisc', 'command_run', player)
+        elseif event.element == console_frame.button_flow.close
+            remote.call('blumisc', 'destroy_gui', player)
+        elseif event.element == console_frame.button_flow.reset
+            remote.call('blumisc', 'destroy_gui', player)
+            remote.call('blumisc', 'make_gui', player)
+        elseif event.element == console_frame.button_flow.clear
+            console_frame.command.text = ''
+
+        if debug
+            player.print "click -> #{gui_tostring(event.element)}"
 
 destroy_gui = (player) ->
     script.on_event defines.events.on_gui_click, nil
