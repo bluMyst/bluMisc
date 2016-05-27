@@ -1,4 +1,10 @@
 local ahtolib = { }
+ahtolib.DEBUG = false
+ahtolib.debug = function(player, string)
+  if ahtolib.DEBUG then
+    return player.print(string)
+  end
+end
 ahtolib.gui_tostring = function(top_element)
   local elements = { }
   local i = top_element

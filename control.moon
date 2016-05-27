@@ -2,7 +2,9 @@ std     = require 'std._base'
 ahtolib = require 'ahtolib'
 require 'defines'
 
+-- moonscript doesn't have "a = b = c" syntax
 DEBUG = true
+ahtolib.DEBUG = DEBUG
 
 command_run = (player) ->
     console_frame = player.gui.top.console_frame
@@ -14,8 +16,9 @@ command_run = (player) ->
     -- loadstring('return 1+1') -> function
     command = loadstring("return #{command}") or loadstring(command)
     success, return_ = pcall(command)
+
     if success
-        player.print std.tostring(return_)
+        player.print std.tostring return_
     else
         player.print "ERROR: #{return_}"
 
@@ -76,7 +79,7 @@ make_gui = (player) ->
         elseif event.element == console_frame.button_flow.clear
             console_frame.command.text = ''
 
-        if debug
+        if DEBUG
             player.print "click -> #{ahtolib.gui_tostring(event.element)}"
 
 destroy_gui = (player) ->
@@ -84,9 +87,9 @@ destroy_gui = (player) ->
     player.gui.top.console_frame.destroy()
 
 remote.add_interface 'blumisc', {
-    make_gui:make_gui,
-    destroy_gui:destroy_gui,
-    command_run:command_run}
+    make_gui:     make_gui,
+    destroy_gui:  destroy_gui,
+    command_run:  command_run}
 --  get: -> {make_gui:make_gui, destroy_gui:destroy_gui}}
 -- can't copy object of type function
 

@@ -1,5 +1,11 @@
 ahtolib = {}
 
+ahtolib.DEBUG = false
+
+ahtolib.debug = (player, string) ->
+    if ahtolib.DEBUG
+        player.print string
+
 ahtolib.gui_tostring = (top_element) ->
     elements = {}
     i = top_element

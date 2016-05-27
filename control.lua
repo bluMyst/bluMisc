@@ -2,6 +2,7 @@ local std = require('std._base')
 local ahtolib = require('ahtolib')
 require('defines')
 local DEBUG = true
+ahtolib.DEBUG = DEBUG
 local command_run
 command_run = function(player)
   local console_frame = player.gui.top.console_frame
@@ -70,7 +71,7 @@ make_gui = function(player)
     elseif event.element == console_frame.button_flow.clear then
       console_frame.command.text = ''
     end
-    if debug then
+    if DEBUG then
       return player.print("click -> " .. tostring(ahtolib.gui_tostring(event.element)))
     end
   end)
