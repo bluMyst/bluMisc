@@ -1,4 +1,5 @@
 local std = require('std._base')
+local ahtolib = require('ahtolib')
 require('defines')
 local DEBUG = true
 local command_run
@@ -56,23 +57,21 @@ make_gui = function(player)
     name = 'close',
     caption = 'close'
   })
-  script.on_event(defines.events.on_gui_click, function(event)
-    return game.players[event.player_index].print('test')
-  end)
   return script.on_event(defines.events.on_gui_click, function(event)
     player = game.players[event.player_index]
     console_frame = player.gui.top.console_frame
     if event.element == console_frame.button_flow.submit then
-      return remote.call('blumisc', 'command_run', player)
+      remote.call('blumisc', 'command_run', player)
     elseif event.element == console_frame.button_flow.close then
-      return remote.call('blumisc', 'destroy_gui', player)
+      remote.call('blumisc', 'destroy_gui', player)
     elseif event.element == console_frame.button_flow.reset then
       remote.call('blumisc', 'destroy_gui', player)
-      return remote.call('blumisc', 'make_gui', player)
+      remote.call('blumisc', 'make_gui', player)
     elseif event.element == console_frame.button_flow.clear then
       console_frame.command.text = ''
-    elseif debug then
-      return player.print("click -> " .. tostring(event.element.parent.name) .. "/" .. tostring(event.element.name))
+    end
+    if debug then
+      return player.print("click -> " .. tostring(ahtolib.gui_tostring(event.element)))
     end
   end)
 end

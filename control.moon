@@ -1,19 +1,8 @@
-std = require 'std._base'
+std     = require 'std._base'
+ahtolib = require 'ahtolib'
 require 'defines'
 
 DEBUG = true
-
-gui_tostring = (top_element) ->
-    elements = {}
-    i = top_element
-
-    while i != nil:
-        elements[#elements++] = i.name
-        i = i.parent
-
-    s = table.concat(std.ireverse(elements), '/')
-
-    return s
 
 command_run = (player) ->
     console_frame = player.gui.top.console_frame
@@ -88,7 +77,7 @@ make_gui = (player) ->
             console_frame.command.text = ''
 
         if debug
-            player.print "click -> #{gui_tostring(event.element)}"
+            player.print "click -> #{ahtolib.gui_tostring(event.element)}"
 
 destroy_gui = (player) ->
     script.on_event defines.events.on_gui_click, nil
