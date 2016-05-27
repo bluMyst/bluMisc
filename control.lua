@@ -61,14 +61,15 @@ make_gui = function(player)
   return script.on_event(defines.events.on_gui_click, function(event)
     player = game.players[event.player_index]
     console_frame = player.gui.top.console_frame
-    if event.element == console_frame.button_flow.submit then
+    local _exp_0 = event.element
+    if console_frame.button_flow.submit == _exp_0 then
       remote.call('blumisc', 'command_run', player)
-    elseif event.element == console_frame.button_flow.close then
+    elseif console_frame.button_flow.close == _exp_0 then
       remote.call('blumisc', 'destroy_gui', player)
-    elseif event.element == console_frame.button_flow.reset then
+    elseif console_frame.button_flow.reset == _exp_0 then
       remote.call('blumisc', 'destroy_gui', player)
       remote.call('blumisc', 'make_gui', player)
-    elseif event.element == console_frame.button_flow.clear then
+    elseif console_frame.button_flow.clear == _exp_0 then
       console_frame.command.text = ''
     end
     if DEBUG then

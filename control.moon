@@ -68,16 +68,17 @@ make_gui = (player) ->
         player = game.players[event.player_index]
         console_frame = player.gui.top.console_frame
 
-        if event.element == console_frame.button_flow.submit
-            -- can't just call it because of weird namespace problem
-            remote.call('blumisc', 'command_run', player)
-        elseif event.element == console_frame.button_flow.close
-            remote.call('blumisc', 'destroy_gui', player)
-        elseif event.element == console_frame.button_flow.reset
-            remote.call('blumisc', 'destroy_gui', player)
-            remote.call('blumisc', 'make_gui', player)
-        elseif event.element == console_frame.button_flow.clear
-            console_frame.command.text = ''
+        switch event.element
+            when console_frame.button_flow.submit
+                -- can't just call it because of weird namespace problem
+                remote.call('blumisc', 'command_run', player)
+            when console_frame.button_flow.close
+                remote.call('blumisc', 'destroy_gui', player)
+            when console_frame.button_flow.reset
+                remote.call('blumisc', 'destroy_gui', player)
+                remote.call('blumisc', 'make_gui', player)
+            when console_frame.button_flow.clear
+                console_frame.command.text = ''
 
         if DEBUG
             player.print "click -> #{ahtolib.gui_tostring(event.element)}"
