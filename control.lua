@@ -86,9 +86,10 @@ remote.add_interface('blumisc', {
   destroy_gui = destroy_gui,
   command_run = command_run
 })
-return script.on_event(defines.events.on_player_created, function(event)
-  local player = game.players[event.player_index]
-  if player.gui.top.console_frame == nil then
-    return make_gui(player)
+return script.on_init(function()
+  local _list_0 = game.players
+  for _index_0 = 1, #_list_0 do
+    local player = _list_0[_index_0]
+    make_gui(player)
   end
 end)

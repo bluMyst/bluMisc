@@ -93,10 +93,6 @@ remote.add_interface 'blumisc', {
 --  get: -> {make_gui:make_gui, destroy_gui:destroy_gui}}
 -- can't copy object of type function
 
-script.on_event defines.events.on_player_created, (event) ->
-    -- BUG: Doesn't work for sandbox mode.
-    player = game.players[event.player_index]
-
-    if player.gui.top.console_frame == nil
+script.on_init ->
+    for player in *game.players
         make_gui player
--- 'game' is nil...?
