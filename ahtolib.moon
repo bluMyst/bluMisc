@@ -37,10 +37,11 @@ ahtolib.element_children = (element, recursive=true) ->
     for child_name in *element.children_names
         children[#children+1] = element[child_name]
 
-    if not recursive then return children
+    if recursive
+        for child in *children
+            children_of_child = ahtolib.element_children(child)
+            ahtolib.table_extend children, children_of_child, true
 
-    for child in *children
-        children_of_child = ahtolib.element_children(child)
-        ahtolib.table_extend children, children_of_child, true
+    return children
 
 return ahtolib

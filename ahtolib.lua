@@ -40,13 +40,13 @@ ahtolib.element_children = function(element, recursive)
     local child_name = _list_0[_index_0]
     children[#children + 1] = element[child_name]
   end
-  if not recursive then
-    return children
+  if recursive then
+    for _index_0 = 1, #children do
+      local child = children[_index_0]
+      local children_of_child = ahtolib.element_children(child)
+      ahtolib.table_extend(children, children_of_child, true)
+    end
   end
-  for _index_0 = 1, #children do
-    local child = children[_index_0]
-    local children_of_child = ahtolib.element_children(child)
-    ahtolib.table_extend(children, children_of_child, true)
-  end
+  return children
 end
 return ahtolib
