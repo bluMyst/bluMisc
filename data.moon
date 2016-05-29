@@ -1,3 +1,1 @@
--- Bad idea:
--- require 'control'
--- (long story, see template repo)
+require 'prototypes.styles'
