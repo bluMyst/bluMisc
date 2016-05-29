@@ -1,37 +1,44 @@
 std = require 'std._base'
 
-ahtolib = {}
+ahto = {}
 
-ahtolib.DEBUG = false
+ahto.DEBUG = false
 
-ahtolib.debug = (player, string) ->
-    if ahtolib.DEBUG
+ahto.debug = (player=game.player, string) ->
+    if ahto.DEBUG
         player.print string
 
-ahtolib.gui_tostring = (top_element) ->
+ahto.gui_tostring = (top_element) ->
     elements = {}
-    i = top_element
 
+    if top_element == nil
+        return '[nil-value "element"]'
+    elseif not top_element.valid
+        return '[invalid element]'
+
+    i = top_element
     while i != nil
-        elements[#elements+1] = i.name
+        elements[#elements+1] = if i.name != '' then i.name else '[root]'
         i = i.parent
 
-    s = table.concat(std.ireverse(elements), '/')
+    -- reverse elements
+    elements = [std.tostring(i) for i in *elements[#elements,1,-1]]
 
-    return s
+    string_ = table.concat(elements, '/')
+    return string_
 
-ahtolib.table_extend = (table1, table2, destructive=false) ->
+ahto.table_extend = (table1, table2, destructive=false) ->
+    new_table = table1
+
     if not destructive
         new_table = std.table.clone table1
-    else
-        new_table = table1
 
-    for i in table2
+    for i in *table2
         new_table[#new_table+1] = i
 
     return new_table
 
-ahtolib.element_children = (element, recursive=true) ->
+ahto.element_children = (element, recursive=true) ->
     children = {}
 
     for child_name in *element.children_names
@@ -39,9 +46,9 @@ ahtolib.element_children = (element, recursive=true) ->
 
     if recursive
         for child in *children
-            children_of_child = ahtolib.element_children(child)
-            ahtolib.table_extend children, children_of_child, true
+            children_of_child = ahto.element_children(child)
+            ahto.table_extend children, children_of_child, true
 
     return children
 
-return ahtolib
+return ahto
