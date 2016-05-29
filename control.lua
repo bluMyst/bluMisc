@@ -1,7 +1,7 @@
 local std = require('std._base')
 local ahto = require('ahtolib')
 require('defines')
-local DEBUG = true
+local DEBUG = false
 ahto.DEBUG = DEBUG
 local gui_events = { }
 local element_on_click
@@ -61,6 +61,18 @@ command_run = function(player)
     return player.print(return_s)
   end
 end
+local debug_toggle
+debug_toggle = function(player)
+  DEBUG = not DEBUG
+  ahto.DEBUG = DEBUG
+  return player.print("debug mode: " .. tostring((function()
+    if DEBUG then
+      return 'on'
+    else
+      return 'off'
+    end
+  end)()))
+end
 local make_console_icon
 make_console_icon = function(player)
   player.gui.top.add({
@@ -96,7 +108,8 @@ make_console = function(player)
   local console_frame = player.gui.top.console_frame
   console_frame.add({
     type = 'textfield',
-    name = 'command'
+    name = 'command',
+    style = 'long_textfield_style'
   })
   console_frame.add({
     type = 'flow',
@@ -126,9 +139,17 @@ make_console = function(player)
     name = 'close',
     caption = 'close'
   })
-  return element_on_click(button_flow.close, function(event, player)
+  element_on_click(button_flow.close, function(event, player)
     remote.call('blumisc', 'close_console', player)
     return remote.call('blumisc', 'make_console_icon', player)
+  end)
+  button_flow.add({
+    type = 'button',
+    name = 'debug_toggle',
+    caption = '!'
+  })
+  return element_on_click(button_flow.debug_toggle, function(event, player)
+    return remote.call('blumisc', 'debug_toggle', player)
   end)
 end
 local close_console
@@ -140,11 +161,16 @@ remote.add_interface('blumisc', {
   close_console = close_console,
   make_console_icon = make_console_icon,
   close_console_icon = close_console_icon,
+  make_debug_button = make_debug_button,
+  debug_toggle = debug_toggle,
   command_run = command_run
 })
 return script.on_event(defines.events.on_player_created, function(event)
   local player = game.players[event.player_index]
   if not player.gui.top.open_console and not player.gui.top.console_frame then
-    return make_console_icon(player)
+    make_console_icon(player)
+  end
+  if DEBUG and not player.gui.left.debug_toggle then
+    return make_debug_button(player)
   end
 end)

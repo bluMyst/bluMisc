@@ -3,7 +3,7 @@ ahto = require 'ahtolib'
 require 'defines'
 
 -- moonscript doesn't have "a = b = c" syntax
-DEBUG = true
+DEBUG = false
 ahto.DEBUG = DEBUG
 
 -- {gui_element: {on_click:f, on_asdf:g}}
@@ -63,6 +63,12 @@ command_run = (player) ->
     if not success then return_s = "ERROR: #{return_s}"
     player.print return_s if return_ != nil
 
+debug_toggle = (player) ->
+    DEBUG = not DEBUG
+    ahto.DEBUG = DEBUG
+
+    player.print "debug mode: #{if DEBUG then 'on' else 'off'}"
+
 make_console_icon = (player) ->
     -- won't look like an icon at first, but should be after styling it to be
     -- tiny
@@ -93,6 +99,7 @@ make_console = (player) ->
     console_frame.add
         type:  'textfield'
         name:  'command'
+        style: 'long_textfield_style'
 
     console_frame.add
         type:       'flow'
@@ -125,6 +132,13 @@ make_console = (player) ->
         remote.call 'blumisc', 'close_console', player
         remote.call 'blumisc', 'make_console_icon' ,player
 
+    button_flow.add
+        type: 'button'
+        name: 'debug_toggle'
+        caption: '!'
+    element_on_click button_flow.debug_toggle, (event, player) ->
+        remote.call 'blumisc', 'debug_toggle', player
+
 close_console = (player) ->
     element_destroy player.gui.top.console_frame
 
@@ -133,6 +147,8 @@ remote.add_interface 'blumisc', {
     close_console:       close_console,
     make_console_icon:   make_console_icon,
     close_console_icon:  close_console_icon,
+    make_debug_button:   make_debug_button,
+    debug_toggle:        debug_toggle,
     command_run:         command_run}
 
 --script.on_init ->
@@ -140,3 +156,6 @@ script.on_event defines.events.on_player_created, (event) ->
     player = game.players[event.player_index]
     if not player.gui.top.open_console and not player.gui.top.console_frame
         make_console_icon player
+
+    if DEBUG and not player.gui.left.debug_toggle
+        make_debug_button(player)
